@@ -52,13 +52,13 @@ def baixa_dados(aux):
     agora = datetime.datetime.now()
     agora = agora.strftime("%Y%m%d%H%M%S")
 
-    if not os.path.exists(DESTINO + programa):
-        os.makedirs(DESTINO + programa)
+    if not os.path.exists(DESTINO):
+        os.makedirs(DESTINO)
 
     with open(DESTINO_LOCAL + agora + arquivo, 'w') as f:
         f.write(dados)
 
-    with open(DESTINO + programa + '/' + arquivo, 'w') as f:
+    with open(DESTINO + '/' + arquivo, 'w') as f:
         f.write(dados)
 
 

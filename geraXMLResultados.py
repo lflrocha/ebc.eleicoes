@@ -37,7 +37,6 @@ portas = ['8080', '8081', '8082', '8083']
 porta = random.choice(portas)
 url = "http://gcebc-prod01.ebc:%s/ebcgceleicoes/resultados/getCidadesResultadosText" % porta
 
-
 def geraXMLCidade(cidade):
     url = URL + "/2020/municipal/primeiro-turno/dados/prefeito/%s.json" % cidade
     req = requests.get(url)
@@ -55,7 +54,6 @@ def geraXMLCidade(cidade):
     destino_fotos2 = DESTINO_FOTOS2 + uf.lower()
     if not os.path.isdir(destino_fotos2):
         os.makedirs(destino_fotos2)
-
 
     dados_candidatos = []
     for candidato in candidatos[:4]:
@@ -81,7 +79,6 @@ def geraXMLCidade(cidade):
         if not os.path.isfile(caminho_foto2):
             r = requests.get(url_fotos, allow_redirects=True)
             open(caminho_foto2, 'wb').write(r.content)
-
 
         if "status" in  candidato.keys():
             status = candidato['status']

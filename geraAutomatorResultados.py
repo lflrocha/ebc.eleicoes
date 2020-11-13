@@ -1,4 +1,5 @@
-#!/usr/bin/env python3# -*- coding: UTF-8 -*-
+#!/usr/bin/env python3
+# -*- coding: UTF-8 -*-
 
 import os
 import requests
@@ -12,7 +13,7 @@ TCP_PORT = 5250
 BUFFER_SIZE = 4096
 MESSAGE = ""
 
-destino_fotos = "/Volumes/D/#CasparEBC/_RUNDOWN/eleicoes/fotos/"
+destino_fotos = "/Volumes/D/#CasparEBC/rundown/eleicoes/fotos/"
 
 def main():
     req = requests.get('https://eleicoes.ebc.com.br/2020/municipal/primeiro-turno/complemento/prefeito/capitais.json')
@@ -73,7 +74,6 @@ def main():
 #            url_fotos = 'http://web1-prod-eleicoes.ebc/2020/municipal/primeiro-turno/complemento/prefeito/fotos/' + sigla_uf.lower() + '/' + foto + '.jpg'
             url_fotos = 'http://web1-prod-eleicoes.ebc/fotos/AC/10000644872.jpg'
             r = requests.get(url_fotos, allow_redirects=True)
-            print(caminho_foto)
             open(caminho_foto, 'wb').write(r.content)
             if not os.path.isfile(caminho_foto):
                 r = requests.get(url_fotos, allow_redirects=True)
