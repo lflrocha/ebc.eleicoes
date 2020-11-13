@@ -1,4 +1,4 @@
-#!/usr/local/bin/python3
+#!/usr/bin/env python3
 # -*- coding: UTF-8 -*-
 
 from datetime import datetime
@@ -9,7 +9,7 @@ import json
 import os
 import requests
 from multiprocessing.dummy import Pool
-from cidade import cidades
+from cidades import cidades
 
 def gera_resultado(itens):
 
@@ -119,9 +119,7 @@ def gera_resultado(itens):
     if not os.path.isdir(pasta_saida):
         os.makedirs(pasta_saida)
 
-    data = datetime.now()
-    data = data.strftime("%y%m%d-%H%M%S")
-    caminho_saida = pasta_saida + arquivo_saida + '-' + data + '.png'
+    caminho_saida = pasta_saida + arquivo_saida + '.png'
     base.save(caminho_saida)
     #base.show()
 
@@ -135,7 +133,7 @@ def main():
 
     itens = []
     for cidade in cidades:
-        url = "https://eleicoes.ebc.com.br/2020/municipal/primeiro-turno/dados/prefeito/%s.json" % cidade
+        url = "https://eleicoes.ebc.com.br/dev/2020/municipal/primeiro-turno/dados/prefeito/%s.json" % cidade
         req = requests.get(url)
         resultado = req.json()
 
@@ -164,10 +162,12 @@ def main():
             arq_urnas = arq_urnas[0]
         arq_urnas = arq_urnas.zfill(3)
 
+        data = datetime.now()
+        data = data.strftime("%y%m%d-%H%M%S")
 
-        arquivo = arq_urnas + '_' + cidade.replace(' ', '-').replace('---', '-')
-
-        pasta_saida = './saida/' + resultado['sigla_uf'] + '/'
+        arquivo = arq_urnas + '_' + data + '_' + cidade.replace(' ', '-').replace('---', '-')
+        arquivo = slugify(arquivo)
+        pasta_saida = './saida/' + resultado['sigla_uf'].lower() + '/' + slugify(resultado['nome_cidade']) + '/'
         itens.append([cidade, subtitulo, urnas, cands, pasta_saida, arquivo])
 
     pool = Pool(20)
