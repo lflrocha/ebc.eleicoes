@@ -22,6 +22,7 @@ if devel:
 else:
     DESTINO = "/mnt/casparcg/rundown/eleicoes/"
     DESTINO_FOTOS = "/mnt/casparcg/rundown/eleicoes/fotos/"
+    DESTINO_FOTOS2 = "/Volumes/#CasparEBC/rundown/eleicoes/fotos/"
     DESTINO_LOCAL =  "/opt/ebc.eleicoes/saidas/resultados/"
     if not os.path.isdir(DESTINO):
         os.system("mkdir /mnt/casparcg; mount -t cifs -o username=casparcg,password=casparcg //10.61.30.37/casparcg /mnt/casparcg")
