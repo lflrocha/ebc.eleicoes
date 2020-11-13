@@ -1,4 +1,4 @@
-#!/usr/local/bin/python3
+#!/usr/bin/env python3
 # -*- coding: UTF-8 -*-
 
 import os
@@ -15,6 +15,7 @@ devel = False
 if devel:
     DESTINO = "/Volumes/casparcg/rundown/eleicoes/"
     DESTINO_FOTOS = "/Volumes/casparcg/rundown/eleicoes/fotos/"
+    DESTINO_FOTOS2 = "/Volumes/#CasparEBC/rundown/eleicoes/fotos/"
     DESTINO_LOCAL =  "./saidas/resultados/"
     if not os.path.isdir(DESTINO):
        os.system("mkdir /Volumes/casparcg; mount -t cifs -o username=casparcg,password=casparcg //10.61.30.37/casparcg /Volumes/casparcg")
@@ -47,8 +48,13 @@ def geraXMLCidade(cidade):
     candidatos = resultado['candidatos']
 
     destino_fotos = DESTINO_FOTOS + uf.lower()
-    if not os.path.isdir(DESTINO_FOTOS):
-        os.makedirs(DESTINO_FOTOS)
+    if not os.path.isdir(destino_fotos):
+        os.makedirs(destino_fotos)
+
+    destino_fotos2 = DESTINO_FOTOS2 + uf.lower()
+    if not os.path.isdir(destino_fotos2):
+        os.makedirs(destino_fotos2)
+
 
     dados_candidatos = []
     for candidato in candidatos[:4]:
@@ -58,11 +64,23 @@ def geraXMLCidade(cidade):
         votos_percentual = candidato['votos_percent']
         foto = candidato['cod_imagem']
 
-        caminho_foto = DESTINO_FOTOS + '/' + str(foto) + '.jpg'
+        caminho_foto = destino_fotos + '/' + str(foto) + '.jpg'
         url_fotos = URL_FOTOS + uf + '/' + foto + '.jpg'
+        url_fotos = 'https://eleicoes.ebc.com.br/fotos/AC/10000644872.jpg'
+        print(url_fotos)
         if not os.path.isfile(caminho_foto):
             r = requests.get(url_fotos, allow_redirects=True)
             open(caminho_foto, 'wb').write(r.content)
+
+        caminho_foto2 = destino_fotos2 + '/' + str(foto) + '.jpg'
+        print(caminho_foto2)
+        url_fotos = URL_FOTOS + uf + '/' + foto + '.jpg'
+        url_fotos = 'https://eleicoes.ebc.com.br/fotos/AC/10000644872.jpg'
+        print(url_fotos)
+        if not os.path.isfile(caminho_foto2):
+            r = requests.get(url_fotos, allow_redirects=True)
+            open(caminho_foto2, 'wb').write(r.content)
+
 
         if "status" in  candidato.keys():
             status = candidato['status']
@@ -77,7 +95,7 @@ def geraXMLCidade(cidade):
     aux = aux + '<type>TEMPLATE</type>\n'
     aux = aux + '<devicename>Local CasparCG</devicename>\n'
     aux = aux + '<label>%s/%s - %s</label>\n' % (cidade, uf, urnas)
-    aux = aux + '<name>eleicoes_resultado</name>\n'
+    aux = aux + '<name>eleicoes/eleicoes_resultado</name>\n'
     aux = aux + '<channel>1</channel>\n'
     aux = aux + '<videolayer>%s</videolayer>\n' % 90
     aux = aux + '<delay>0</delay>\n'
@@ -94,17 +112,31 @@ def geraXMLCidade(cidade):
     aux = aux + '<sendasjson>false</sendasjson>\n'
     aux = aux + '<templatedata>\n'
     aux = aux + '<componentdata>\n'
-    aux = aux + '<id>f01</id>\n'
+    aux = aux + '<id>f1</id>\n'
     aux = aux + '<value>%s</value>\n' % cidade
     aux = aux + '</componentdata>\n'
     aux = aux + '<componentdata>\n'
-    aux = aux + '<id>f02</id>\n'
+    aux = aux + '<id>f2</id>\n'
     aux = aux + '<value>%s</value>\n' % uf
     aux = aux + '</componentdata>\n'
     aux = aux + '<componentdata>\n'
-    aux = aux + '<id>f03</id>\n'
+    aux = aux + '<id>f3</id>\n'
     aux = aux + '<value>%s%%</value>\n' % urnas
     aux = aux + '</componentdata>\n'
+
+    aux = aux + '<componentdata>\n'
+    aux = aux + '<id>f4</id>\n'
+    aux = aux + '<value>Eleição para prefeito</value>\n'
+    aux = aux + '</componentdata>\n'
+    aux = aux + '<componentdata>\n'
+    aux = aux + '<id>f5</id>\n'
+    aux = aux + '<value>Urnas apuradas</value>\n'
+    aux = aux + '</componentdata>\n'
+    aux = aux + '<componentdata>\n'
+    aux = aux + '<id>f6</id>\n'
+    aux = aux + '<value></value>\n'
+    aux = aux + '</componentdata>\n'
+
 
     for i, item in enumerate(dados_candidatos):
         index = (i + 1) * 10
@@ -171,7 +203,8 @@ for regiao in regioes:
     for cidade in cidades:
         xml = geraXMLCidade(cidade)
         aux = aux + str(xml)
-    aux = aux + '<items>\n'
+    aux = aux + '</items>\n'
+    aux = aux + '</item>\n'
 
 aux = aux + '</items>\n'
 

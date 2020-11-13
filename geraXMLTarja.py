@@ -1,4 +1,4 @@
-#!/usr/local/bin/python3
+#!/usr/bin/env python3
 # -*- coding: UTF-8 -*-
 
 import os
@@ -11,7 +11,7 @@ from multiprocessing.dummy import Pool
 from slugify import slugify
 
 
-devel = True
+devel = False
 
 if devel:
     DESTINO = "/Volumes/casparcg/rundown/eleicoes/"
