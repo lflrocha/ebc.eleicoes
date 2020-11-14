@@ -137,7 +137,7 @@ def gera_resultado(itens):
 def main():
 
     inicio = datetime.now()
-
+    print(inicio.strftime("%H:%M:%S"))
     if os.path.isfile(ROOT + 'cidades_resultados.p'):
         with open (ROOT + 'cidades_resultados.p', 'rb') as fp:
             cidades_resultados = pickle.load(fp)
@@ -156,7 +156,6 @@ def main():
         with open(DESTINO_LOCAL + agora + "-" + cod_cidade + ".json", 'w') as f:
             f.write(text)
 
-
         urnas = resultado['secoes_totalizadas_percent']
         urnas_anterior = ""
         cidade_na_lista = False
@@ -167,6 +166,7 @@ def main():
 
         if (cidade_na_lista == False) or (cidade_na_lista == True and urnas != urnas_anterior):
             cidade = resultado['nome_cidade'] + '-' + resultado['sigla_uf']
+            print(resultado['sigla_uf'] + '-' + resultado['nome_cidade'])
             subtitulo = "Prefeito"
             candidatos = resultado['candidatos']
             cands = []
@@ -201,11 +201,14 @@ def main():
     with open(ROOT + 'cidades_resultados.p', 'wb') as fp:
         pickle.dump(cidades_resultados, fp)
 
+    agora = datetime.now()
+    print(agora.strftime("%H:%M:%S"))
+
     pool = Pool(20)
     result = pool.map(gera_resultado, itens)
 
     fim = datetime.now()
-    print(fim-inicio)
+    print(fim.strftime("%H:%M:%S"), fim-inicio)
     os.system(ROOT + "/sync.sh")
 
 
