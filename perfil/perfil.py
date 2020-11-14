@@ -10,18 +10,6 @@ import os
 import requests
 from multiprocessing.dummy import Pool
 
-def hex2rgb(cor, alpha):
-    r = int(cor[1:3], 16)
-    g = int(cor[3:5], 16)
-    b = int(cor[5:7], 16)
-
-    if alpha == True:
-        ret = (r, g, b, 255)
-    else:
-        ret = (r, g, b)
-    return(ret)
-
-
 def gera_perfil(itens):
 
     titulo = itens[0]
@@ -121,8 +109,6 @@ def gera_perfil(itens):
         baseImg.text((linha1X, linha1Y), texto.strip(), font=fonte_perfil, fill=cor_textos)
 
 
-    if not os.path.isdir(pasta_saida):
-        os.makedirs(pasta_saida)
 
     caminho_saida = pasta_saida + arquivo_saida
     base.save(caminho_saida)
@@ -147,24 +133,11 @@ def main():
     print(len(dados))
     itens = []
     for i, dado in enumerate(dados):
-        # {'seq_candidato': '60000717316',
-        # 'cod_uf': 'CE',
-        # 'cod_cidade': '13897',
-        # 'num_partido': '80',
-        # 'sigla_partido': 'UP',
-        # 'nome_urna': 'PAULA COLARES',
-        # 'nome_ebc': 'PAULA COLARES',
-        # 'idade': '40',
-        # 'cidade_natal': 'FORTALEZA',
-        # 'uf_natal': 'CE', 'profissao':
-        # 'PEDAGOGA',
-        # 'perfil': 'Professora da rede municipal, integra a Coordenação Nacional do Movimento de Mulheres Olga Benário. Preside no Ceará o Partido Unidade Popular.'}
-
-        #print(dado)
-        titulo = dado['cod_cidade'] + '/' + dado['cod_uf']
-        titulo = get_key(cidades, dado['cod_cidade'])
+        cidade = get_key(cidades, dado['cod_cidade'])
+        cidade = cidade.split(' - ')[0]
+        titulo = cidade + '/' + dado['cod_uf']
         subtitulo = "Candidato eleito"
-        cidade = dado['cidade_natal'] + '/' + dado['uf_natal']
+        cidade_natal = dado['cidade_natal'] + '/' + dado['uf_natal']
         idade = dado['idade'] + " anos"
         profissao = dado['profissao']
         perfil = dado['perfil']
@@ -173,8 +146,13 @@ def main():
         foto = "/%s/%s.jpg" % (dado['cod_uf'], dado['seq_candidato'])
 
         pasta_saida = './saida/' + dado['cod_uf'] + '/'
-        arquivo_saida = "VT_" + dado['cod_cidade'].replace(' ', '-') + '_' + dado['cod_uf'] + '_' + nome.replace(' ', '-') + '.png'
-        itens.append([titulo, subtitulo, cidade, idade, profissao, perfil, nome, partido, foto, pasta_saida, arquivo_saida])
+
+        if not os.path.isdir(pasta_saida):
+            os.makedirs(pasta_saida)
+
+        arquivo_saida = "VT_" + dado['cod_uf'] + '_' + slugify(cidade.replace(' ', '-')) + '_' + slugify(nome.replace(' ', '-')) + '.png'
+        arquivo_saida = arquivo_saida.upper()
+        itens.append([titulo, subtitulo, cidade_natal, idade, profissao, perfil, nome, partido, foto, pasta_saida, arquivo_saida])
 
 
     pool = Pool(20)
