@@ -85,10 +85,9 @@ def main():
 
                 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                 s.connect((TCP_IP, TCP_PORT))
-                print(s)
                 s.send(linha.encode())
-                print(s)
                 data = s.recv(BUFFER_SIZE)
+                print(data)
                 s.close()
                 time.sleep(20)
                 cidades_apresentadas.append(cod)
