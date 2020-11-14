@@ -11,6 +11,10 @@ import requests
 from multiprocessing.dummy import Pool
 from cidades import cidades
 
+from os.path import dirname, abspath
+ROOT = dirname(dirname(abspath(__file__))) + '/'
+
+
 def gera_resultado(itens):
 
     cidade = itens[0]
@@ -26,22 +30,22 @@ def gera_resultado(itens):
     base = Image.new('RGBA', (w, h), (255,255,255,0))
     baseImg = ImageDraw.Draw(base)
 
-    fonte_cidade = ImageFont.truetype('fonts/OpenSansCondensed-Bold.ttf', 50)
-    fonte_subtitulo = ImageFont.truetype('fonts/OpenSans-Regular.ttf', 40)
-    fonte_urnas = ImageFont.truetype('fonts/OpenSans-Italic.ttf', 40)
+    fonte_cidade = ImageFont.truetype(ROOT + '/fonts/OpenSansCondensed-Bold.ttf', 50)
+    fonte_subtitulo = ImageFont.truetype(ROOT +'/fonts/OpenSans-Regular.ttf', 40)
+    fonte_urnas = ImageFont.truetype(ROOT +'/fonts/OpenSans-Italic.ttf', 40)
 
-    fonte_nome = ImageFont.truetype('fonts/OpenSansCondensed-Bold.ttf', 30)
-    fonte_partido = ImageFont.truetype('fonts/OpenSans-Regular.ttf', 25)
-    fonte_percentual = ImageFont.truetype('fonts/OpenSans-Bold.ttf', 46)
-    fonte_votos = ImageFont.truetype('fonts/OpenSans-Regular.ttf', 25)
-    fonte_status = ImageFont.truetype('fonts/OpenSans-Bold.ttf', 45)
+    fonte_nome = ImageFont.truetype(ROOT +'/fonts/OpenSansCondensed-Bold.ttf', 30)
+    fonte_partido = ImageFont.truetype(ROOT +'/fonts/OpenSans-Regular.ttf', 25)
+    fonte_percentual = ImageFont.truetype(ROOT +'/fonts/OpenSans-Bold.ttf', 46)
+    fonte_votos = ImageFont.truetype(ROOT +'/fonts/OpenSans-Regular.ttf', 25)
+    fonte_status = ImageFont.truetype(ROOT +'/fonts/OpenSans-Bold.ttf', 45)
 
     cor_textos = "#ffffff"
     cor_borda = "#FFD007"
     cor_eleito = "#0f8225"
     cor_normal = "#2c4854"
 
-    bg = Image.open('./assets/bg.png').convert('RGBA')
+    bg = Image.open(ROOT + '/assets/bg.png').convert('RGBA')
     base.paste(bg, (0, 0), mask=bg)
 
     tamanho = baseImg.textsize(cidade.strip(), font=fonte_cidade)
@@ -84,7 +88,7 @@ def gera_resultado(itens):
         baseImg.rectangle( [(linha1X, base_Y), (linha1X + 300, base_Y + 500)], fill=cor)
         baseImg.rectangle( [(linha1X + 42, base_Y + 100), (linha1X + 42 + 216, base_Y + 100 + 300)], fill=cor_borda)
 
-        foto = Image.open('./fotos/' + foto + '.jpg').convert('RGBA')
+        foto = Image.open(ROOT +'/fotos/' + foto + '.jpg').convert('RGBA')
         foto = foto.resize((202, 290), Image.ANTIALIAS)
         base.paste(foto, (linha1X + 50 ,base_Y + 108), mask=foto)
 
@@ -167,7 +171,7 @@ def main():
 
         arquivo = arq_urnas + '_' + data + '_' + cidade.replace(' ', '-').replace('---', '-')
         arquivo = slugify(arquivo)
-        pasta_saida = './saida/' + resultado['sigla_uf'].lower() + '/' + slugify(resultado['nome_cidade']) + '/'
+        pasta_saida = ROOT + '/saida/' + resultado['sigla_uf'].lower() + '/' + slugify(resultado['nome_cidade']) + '/'
         itens.append([cidade, subtitulo, urnas, cands, pasta_saida, arquivo])
 
     pool = Pool(20)
