@@ -11,7 +11,7 @@ from multiprocessing.dummy import Pool
 
 from slugify import slugify
 
-devel = True
+devel = False
 
 if devel:
     DESTINO = "/Volumes/casparcg/rundown/eleicoes/"
@@ -29,7 +29,7 @@ else:
 if not os.path.isdir(DESTINO_LOCAL):
     os.makedirs(DESTINO_LOCAL)
 
-URL = 'https://eleicoes.ebc.com.br'
+URL = ''
 URL_FOTOS = 'https://eleicoes.ebc.com.br/fotos/'
 
 portas = ['8080', '8081', '8082', '8083']
@@ -37,122 +37,122 @@ porta = random.choice(portas)
 url = "http://gcebc-prod01.ebc:%s/ebcgceleicoes/resultados/getCidadesResultadosText" % porta
 
 def geraXMLCidade(cidade):
-    url = URL + "/2020/municipal/primeiro-turno/dados/prefeito/%s.json" % cidade
+    url =  "https://eleicoes.ebc.com.br/2020/municipal/primeiro-turno/dados/prefeito/%s.json" % cidade
     req = requests.get(url)
-    resultado = req.json()
+    if req.status_code == 200:
+        resultado = req.json()
+        cidade = resultado['nome_cidade']
+        uf = resultado['sigla_uf']
+        urnas = resultado['secoes_totalizadas_percent']
+        candidatos = resultado['candidatos']
 
-    cidade = resultado['nome_cidade']
-    uf = resultado['sigla_uf']
-    urnas = resultado['secoes_totalizadas_percent']
-    candidatos = resultado['candidatos']
+        destino_fotos = DESTINO_FOTOS + uf.lower()
+        if not os.path.isdir(destino_fotos):
+            os.makedirs(destino_fotos)
 
-    destino_fotos = DESTINO_FOTOS + uf.lower()
-    if not os.path.isdir(destino_fotos):
-        os.makedirs(destino_fotos)
+        dados_candidatos = []
+        for candidato in candidatos[:4]:
+            nome = candidato['nome']
+            partido = candidato['partido']
+            votos = candidato['votos_total']
+            votos_percentual = candidato['votos_percent']
+            foto = candidato['cod_imagem']
 
-    dados_candidatos = []
-    for candidato in candidatos[:4]:
-        nome = candidato['nome']
-        partido = candidato['partido']
-        votos = candidato['votos_total']
-        votos_percentual = candidato['votos_percent']
-        foto = candidato['cod_imagem']
+            caminho_foto = destino_fotos + '/' + str(foto) + '.jpg'
+            url_fotos = URL_FOTOS + uf + '/' + foto + '.jpg'
+            if not os.path.isfile(caminho_foto):
+                r = requests.get(url_fotos, allow_redirects=True)
+                if r.status_code == 200:
+                    open(caminho_foto, 'wb').write(r.content)
+                else:
+                    shutil.copy2('sem_foto.jpg', caminho_foto)
 
-        caminho_foto = destino_fotos + '/' + str(foto) + '.jpg'
-        url_fotos = URL_FOTOS + uf + '/' + foto + '.jpg'
-        print(url_fotos)
-        if not os.path.isfile(caminho_foto):
-            r = requests.get(url_fotos, allow_redirects=True)
-            if r.status_code == 200:
-                open(caminho_foto, 'wb').write(r.content)
+            if "status" in  candidato.keys():
+                status = candidato['status']
             else:
-                shutil.copy2('sem_foto.png', caminho_foto)
+                status = ""
+            dados_candidatos.append({"nome": nome, "partido": partido, "votos": votos, "votos_percentual": votos_percentual, "foto": foto, "status": status })
 
-        if "status" in  candidato.keys():
-            status = candidato['status']
-        else:
-            status = ""
-        dados_candidatos.append({"nome": nome, "partido": partido, "votos": votos, "votos_percentual": votos_percentual, "foto": foto, "status": status })
-
-    urnas = urnas
-    #urnas = str("%0.2f" % round(float(urnas), 2)).replace(".", ",")
-    aux = ""
-    aux = aux + '<item>\n'
-    aux = aux + '<type>TEMPLATE</type>\n'
-    aux = aux + '<devicename>Local CasparCG</devicename>\n'
-    aux = aux + '<label>%s/%s - %s</label>\n' % (cidade, uf, urnas)
-    aux = aux + '<name>eleicoes/eleicoes_resultado</name>\n'
-    aux = aux + '<channel>1</channel>\n'
-    aux = aux + '<videolayer>%s</videolayer>\n' % 90
-    aux = aux + '<delay>0</delay>\n'
-    aux = aux + '<duration>0</duration>\n'
-    aux = aux + '<allowgpi>false</allowgpi>\n'
-    aux = aux + '<allowremotetriggering>true</allowremotetriggering>\n'
-    aux = aux + '<remotetriggerid></remotetriggerid>\n'
-    aux = aux + '<storyid></storyid>\n'
-    aux = aux + '<flashlayer>1</flashlayer>\n'
-    aux = aux + '<invoke></invoke>\n'
-    aux = aux + '<usestoreddata>false</usestoreddata>\n'
-    aux = aux + '<useuppercasedata>false</useuppercasedata>\n'
-    aux = aux + '<triggeronnext>false</triggeronnext>\n'
-    aux = aux + '<sendasjson>false</sendasjson>\n'
-    aux = aux + '<templatedata>\n'
-    aux = aux + '<componentdata>\n'
-    aux = aux + '<id>f1</id>\n'
-    aux = aux + '<value>%s</value>\n' % cidade
-    aux = aux + '</componentdata>\n'
-    aux = aux + '<componentdata>\n'
-    aux = aux + '<id>f2</id>\n'
-    aux = aux + '<value>%s</value>\n' % uf
-    aux = aux + '</componentdata>\n'
-    aux = aux + '<componentdata>\n'
-    aux = aux + '<id>f3</id>\n'
-    aux = aux + '<value>%s%%</value>\n' % urnas
-    aux = aux + '</componentdata>\n'
-    aux = aux + '<componentdata>\n'
-    aux = aux + '<id>f4</id>\n'
-    aux = aux + '<value>Eleição para prefeito</value>\n'
-    aux = aux + '</componentdata>\n'
-    aux = aux + '<componentdata>\n'
-    aux = aux + '<id>f5</id>\n'
-    aux = aux + '<value>Urnas apuradas</value>\n'
-    aux = aux + '</componentdata>\n'
-    aux = aux + '<componentdata>\n'
-    aux = aux + '<id>f6</id>\n'
-    aux = aux + '<value></value>\n'
-    aux = aux + '</componentdata>\n'
-
-    for i, item in enumerate(dados_candidatos):
-        index = (i + 1) * 10
+        urnas = urnas
+        #urnas = str("%0.2f" % round(float(urnas), 2)).replace(".", ",")
+        aux = ""
+        aux = aux + '<item>\n'
+        aux = aux + '<type>TEMPLATE</type>\n'
+        aux = aux + '<devicename>Local CasparCG</devicename>\n'
+        aux = aux + '<label>%s/%s - %s</label>\n' % (cidade, uf, urnas)
+        aux = aux + '<name>eleicoes/eleicoes_resultado</name>\n'
+        aux = aux + '<channel>1</channel>\n'
+        aux = aux + '<videolayer>%s</videolayer>\n' % 90
+        aux = aux + '<delay>0</delay>\n'
+        aux = aux + '<duration>0</duration>\n'
+        aux = aux + '<allowgpi>false</allowgpi>\n'
+        aux = aux + '<allowremotetriggering>true</allowremotetriggering>\n'
+        aux = aux + '<remotetriggerid></remotetriggerid>\n'
+        aux = aux + '<storyid></storyid>\n'
+        aux = aux + '<flashlayer>1</flashlayer>\n'
+        aux = aux + '<invoke></invoke>\n'
+        aux = aux + '<usestoreddata>false</usestoreddata>\n'
+        aux = aux + '<useuppercasedata>false</useuppercasedata>\n'
+        aux = aux + '<triggeronnext>false</triggeronnext>\n'
+        aux = aux + '<sendasjson>false</sendasjson>\n'
+        aux = aux + '<templatedata>\n'
         aux = aux + '<componentdata>\n'
-        aux = aux + '<id>f%s</id>\n' % str(index)
-        aux = aux + '<value>%s</value>\n' % item["nome"]
+        aux = aux + '<id>f1</id>\n'
+        aux = aux + '<value>%s</value>\n' % cidade
         aux = aux + '</componentdata>\n'
         aux = aux + '<componentdata>\n'
-        aux = aux + '<id>f%s</id>\n' % str(index+1)
-        aux = aux + '<value>%s</value>\n' % item["partido"]
+        aux = aux + '<id>f2</id>\n'
+        aux = aux + '<value>%s</value>\n' % uf
         aux = aux + '</componentdata>\n'
         aux = aux + '<componentdata>\n'
-        aux = aux + '<id>f%s</id>\n' % str(index+2)
-        aux = aux + '<value>%s</value>\n' % "{:,}".format(int(item["votos"])).replace(",",".")
+        aux = aux + '<id>f3</id>\n'
+        aux = aux + '<value>%s%%</value>\n' % urnas
         aux = aux + '</componentdata>\n'
         aux = aux + '<componentdata>\n'
-        aux = aux + '<id>f%s</id>\n' % str(index+3)
-        aux = aux + '<value>%s%%</value>\n' % item["votos_percentual"]
+        aux = aux + '<id>f4</id>\n'
+        aux = aux + '<value>Eleição para prefeito</value>\n'
         aux = aux + '</componentdata>\n'
         aux = aux + '<componentdata>\n'
-        aux = aux + '<id>f%s</id>\n' % str(index+4)
-        aux = aux + '<value>%s</value>\n' % item["foto"]
+        aux = aux + '<id>f5</id>\n'
+        aux = aux + '<value>Urnas apuradas</value>\n'
         aux = aux + '</componentdata>\n'
         aux = aux + '<componentdata>\n'
-        aux = aux + '<id>f%s</id>\n' % str(index+5)
-        aux = aux + '<value>%s</value>\n' % item["status"]
+        aux = aux + '<id>f6</id>\n'
+        aux = aux + '<value></value>\n'
         aux = aux + '</componentdata>\n'
 
-    aux = aux + '</templatedata>\n'
-    aux = aux + '<color>rgba(63, 0, 123, 128)</color>\n'
-    aux = aux + '</item>\n'
+        for i, item in enumerate(dados_candidatos):
+            index = (i + 1) * 10
+            aux = aux + '<componentdata>\n'
+            aux = aux + '<id>f%s</id>\n' % str(index)
+            aux = aux + '<value>%s</value>\n' % item["nome"]
+            aux = aux + '</componentdata>\n'
+            aux = aux + '<componentdata>\n'
+            aux = aux + '<id>f%s</id>\n' % str(index+1)
+            aux = aux + '<value>%s</value>\n' % item["partido"]
+            aux = aux + '</componentdata>\n'
+            aux = aux + '<componentdata>\n'
+            aux = aux + '<id>f%s</id>\n' % str(index+2)
+            aux = aux + '<value>%s</value>\n' % "{:,}".format(int(item["votos"])).replace(",",".")
+            aux = aux + '</componentdata>\n'
+            aux = aux + '<componentdata>\n'
+            aux = aux + '<id>f%s</id>\n' % str(index+3)
+            aux = aux + '<value>%s%%</value>\n' % item["votos_percentual"]
+            aux = aux + '</componentdata>\n'
+            aux = aux + '<componentdata>\n'
+            aux = aux + '<id>f%s</id>\n' % str(index+4)
+            aux = aux + '<value>%s</value>\n' % item["foto"]
+            aux = aux + '</componentdata>\n'
+            aux = aux + '<componentdata>\n'
+            aux = aux + '<id>f%s</id>\n' % str(index+5)
+            aux = aux + '<value>%s</value>\n' % item["status"]
+            aux = aux + '</componentdata>\n'
 
+        aux = aux + '</templatedata>\n'
+        aux = aux + '<color>rgba(63, 0, 123, 128)</color>\n'
+        aux = aux + '</item>\n'
+    else:
+        aux = ""
     return aux
 
 

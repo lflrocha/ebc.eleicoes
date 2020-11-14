@@ -20,13 +20,13 @@ else:
     DESTINO = "/mnt/casparcg/rundown/eleicoes/"
     DESTINO_LOCAL = "/opt/ebc.eleicoes/saidas/crawl/"
 
-URL = 'https://eleicoes.ebc.com.br'
+URL =
 
 if not os.path.isdir(DESTINO_LOCAL):
     os.makedirs(DESTINO_LOCAL)
 
 def main():
-    req = requests.get(URL + '/2020/municipal/primeiro-turno/complemento/prefeito/capitais.json')
+    req = requests.get('https://eleicoes.ebc.com.br/2020/municipal/primeiro-turno/complemento/prefeito/capitais.json')
     dados = req.json()
     lista_ordenada = sorted(dados, key=lambda k: datetime.datetime.strptime(k['ultima_atualizacao'], "%d/%m/%Y %H:%M:%S"), reverse=True)
     cidades = []
