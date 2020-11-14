@@ -20,8 +20,6 @@ else:
     DESTINO = "/mnt/casparcg/rundown/eleicoes/"
     DESTINO_LOCAL = "/opt/ebc.eleicoes/saidas/crawl/"
 
-URL =
-
 if not os.path.isdir(DESTINO_LOCAL):
     os.makedirs(DESTINO_LOCAL)
 
