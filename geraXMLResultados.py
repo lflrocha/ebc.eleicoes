@@ -65,7 +65,7 @@ def geraXMLCidade(cidade):
                 if r.status_code == 200:
                     open(caminho_foto, 'wb').write(r.content)
                 else:
-                    shutil.copy2('sem_foto.jpg', caminho_foto)
+                    shutil.copy2('/opt/ebc.eleicoes/sem_foto.jpg', caminho_foto)
 
             if "status" in  candidato.keys():
                 status = candidato['status']
