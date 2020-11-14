@@ -65,7 +65,7 @@ def main():
                     linha = linha + '<data id=\\"text\\" value=\\"%s\\"/>' % nome
                     linha = linha + '</componentData>'
                     linha = linha + '</templateData>\" \r\n'
-                elif status == "Segundo turno definido":
+                else:
                     nome2 = aux.split('enfrentará ')
                     nome2 = nome2[1].split(' (')[0]
                     linha = 'CG 1-100 ADD 1 \"eleicoes/ELEICOES_TARJA_FOGUETE_2TURNO\" 1 '
