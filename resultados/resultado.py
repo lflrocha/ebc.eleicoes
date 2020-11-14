@@ -179,7 +179,7 @@ def main():
 
     fim = datetime.now()
     print(fim-inicio)
-    os.system(ROOT + "/resultados/sync.sh")
+    os.system(ROOT + "/sync.sh")
 
 
 if __name__ == "__main__":
