@@ -137,7 +137,7 @@ def main():
 
     itens = []
     for cidade in cidades:
-        url = "https://eleicoes.ebc.com.br/dev/2020/municipal/primeiro-turno/dados/prefeito/%s.json" % cidade
+        url = "https://eleicoes.ebc.com.br/2020/municipal/primeiro-turno/dados/prefeito/%s.json" % cidade
         req = requests.get(url)
         resultado = req.json()
 
@@ -155,7 +155,7 @@ def main():
                 votos = candidato['votos_total']
                 status = candidato['status']
                 foto = resultado['sigla_uf'] + '/' + candidato['cod_imagem']
-                foto = 'AC' + '/' + '10000644872'
+                #foto = 'AC' + '/' + '10000644872'
                 cands.append([nome, partido, percent, votos, status, foto])
         cands = cands[:4]
 
