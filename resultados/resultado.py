@@ -138,8 +138,8 @@ def main():
 
     inicio = datetime.now()
 
-    if os.path.isfile('cidades_resultados.p'):
-        with open ('cidades_resultados.p', 'rb') as fp:
+    if os.path.isfile(ROOT + 'cidades_resultados.p'):
+        with open (ROOT + 'cidades_resultados.p', 'rb') as fp:
             cidades_resultados = pickle.load(fp)
     else:
         cidades_resultados = {}
@@ -198,7 +198,7 @@ def main():
             itens.append([cidade, subtitulo, urnas, cands, pasta_saida, arquivo])
             cidades_resultados[cod_cidade] = urnas
 
-    with open('cidades_resultados.p', 'wb') as fp:
+    with open(ROOT + 'cidades_resultados.p', 'wb') as fp:
         pickle.dump(cidades_resultados, fp)
 
     pool = Pool(20)
