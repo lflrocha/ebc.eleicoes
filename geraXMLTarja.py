@@ -41,7 +41,6 @@ def baixaLista(url):
     else:
         return []
 
-
 def baixa_dados(aux):
     arquivo = aux[0]
     programa = aux[1]
@@ -60,7 +59,6 @@ def baixa_dados(aux):
 
     with open(DESTINO + '/' + arquivo, 'w') as f:
         f.write(dados)
-
 
 lista_itens = baixaLista(url)
 itens = []

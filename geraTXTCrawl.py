@@ -41,7 +41,7 @@ def main():
         candidatos = item['candidatos']
         if 'status' in candidatos[0]:
             status0 = candidatos[0]['status']
-            if status0 == "Eleito":
+            if status0 in ["Eleito", "Eleita"]:
                 dados_resultado = "Eleito"
             elif status0 == "2º turno":
                 if 'status' in candidatos[1]:
@@ -49,7 +49,7 @@ def main():
                     if status1 == "2º turno":
                         dados_resultado = "2º turno"
         saida = ""
-        if dados_resultado == "Eleito":
+        if dados_resultado in ["Eleito", "Eleita"]:
             candidato = candidatos[0]
             saida = "<c>%s</c>%s<e>%s</e>%s"% (dados_cidade, espacador, dados_resultado, espacador)
             saida = saida + "<b>%s (%s)</b> %s%% %s" % (candidato['nome_gc'], candidato['partido'], candidato['votos_percent'], espacador)

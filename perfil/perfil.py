@@ -108,8 +108,6 @@ def gera_perfil(itens):
         linha1Y = 670 + (i * 50)
         baseImg.text((linha1X, linha1Y), texto.strip(), font=fonte_perfil, fill=cor_textos)
 
-
-
     caminho_saida = pasta_saida + arquivo_saida
     base.save(caminho_saida)
     #base.show()

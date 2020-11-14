@@ -10,9 +10,14 @@ import os
 import requests
 from multiprocessing.dummy import Pool
 from cidades import cidades
+import pickle
 
 from os.path import dirname, abspath
+
 ROOT = dirname(abspath(__file__)) + '/'
+DESTINO_LOCAL = ROOT + "/dados/"
+if not os.path.isdir(DESTINO_LOCAL):
+    os.makedirs(DESTINO_LOCAL)
 
 
 def gera_resultado(itens):
@@ -70,7 +75,6 @@ def gera_resultado(itens):
     base_X = int((1920 - largura) / 2)
     base_Y = 375
 
-
     for i, candidato in enumerate(candidatos):
         nome = candidato[0]
         partido = candidato[1]
@@ -88,7 +92,10 @@ def gera_resultado(itens):
         baseImg.rectangle( [(linha1X, base_Y), (linha1X + 300, base_Y + 500)], fill=cor)
         baseImg.rectangle( [(linha1X + 42, base_Y + 100), (linha1X + 42 + 216, base_Y + 100 + 300)], fill=cor_borda)
 
-        foto = Image.open(ROOT +'/fotos/' + foto + '.jpg').convert('RGBA')
+        if os.path.isfile(ROOT +'/fotos/' + foto + '.jpg'):
+            foto = Image.open(ROOT +'/fotos/' + foto + '.jpg').convert('RGBA')
+        else:
+            foto = Image.open(ROOT +'/sem_foto.jpg').convert('RGBA')
         foto = foto.resize((202, 290), Image.ANTIALIAS)
         base.paste(foto, (linha1X + 50 ,base_Y + 108), mask=foto)
 
@@ -119,7 +126,6 @@ def gera_resultado(itens):
         nome_X = (300 - tamanho[0]) / 2 + linha1X
         baseImg.text((nome_X, 833), votos.strip(), font=fonte_votos, fill=cor_textos)
 
-
     if not os.path.isdir(pasta_saida):
         os.makedirs(pasta_saida)
 
@@ -128,51 +134,72 @@ def gera_resultado(itens):
     #base.show()
 
 
-
 def main():
-
 
     inicio = datetime.now()
 
+    if os.path.isfile('cidades_resultados.p'):
+        with open ('cidades_resultados.p', 'rb') as fp:
+            cidades_resultados = pickle.load(fp)
+    else:
+        cidades_resultados = {}
 
+    agora = datetime.now()
+    agora = agora.strftime("%Y%m%d%H%M%S")
     itens = []
-    for cidade in cidades:
-        url = "https://eleicoes.ebc.com.br/2020/municipal/primeiro-turno/dados/prefeito/%s.json" % cidade
+    for cod_cidade in cidades:
+        url = "https://eleicoes.ebc.com.br/2020/municipal/primeiro-turno/dados/prefeito/%s.json" % cod_cidade
         req = requests.get(url)
         resultado = req.json()
+        text = req.text
 
-        cidade = resultado['nome_cidade'] + '-' + resultado['sigla_uf']
-        subtitulo = "Prefeito"
+        with open(DESTINO_LOCAL + agora + "-" + cod_cidade + ".json", 'w') as f:
+            f.write(text)
+
+
         urnas = resultado['secoes_totalizadas_percent']
-        candidatos = resultado['candidatos']
-        cands = []
-        for candidato in candidatos:
-            destinacao = candidato['destinacao_voto']
-            if destinacao == 'Válido':
-                nome = candidato['nome_gc']
-                partido = candidato['partido']
-                percent = candidato['votos_percent'] + '%'
-                votos = candidato['votos_total']
-                status = candidato['status']
-                foto = resultado['sigla_uf'] + '/' + candidato['cod_imagem']
-                #foto = 'AC' + '/' + '10000644872'
-                cands.append([nome, partido, percent, votos, status, foto])
-        cands = cands[:4]
+        urnas_anterior = ""
+        cidade_na_lista = False
 
-        arq_urnas = urnas.split(',')
-        if len(arq_urnas) > 1:
-            arq_urnas = arq_urnas[0]
-        else:
-            arq_urnas = arq_urnas[0]
-        arq_urnas = arq_urnas.zfill(3)
+        if cod_cidade in cidades_resultados.keys():
+            cidade_na_lista = True
+            urnas_anterior = cidades_resultados[cod_cidade]
 
-        data = datetime.now()
-        data = data.strftime("%y%m%d-%H%M%S")
+        if (cidade_na_lista == False) or (cidade_na_lista == True and urnas != urnas_anterior):
+            cidade = resultado['nome_cidade'] + '-' + resultado['sigla_uf']
+            subtitulo = "Prefeito"
+            candidatos = resultado['candidatos']
+            cands = []
+            for candidato in candidatos:
+                destinacao = candidato['destinacao_voto']
+                if destinacao == 'Válido':
+                    nome = candidato['nome_gc']
+                    partido = candidato['partido']
+                    percent = candidato['votos_percent'] + '%'
+                    votos = candidato['votos_total']
+                    status = candidato['status']
+                    foto = resultado['sigla_uf'] + '/' + candidato['cod_imagem']
+                    cands.append([nome, partido, percent, votos, status, foto])
+            cands = cands[:4]
 
-        arquivo = arq_urnas + '_' + data + '_' + cidade.replace(' ', '-').replace('---', '-')
-        arquivo = slugify(arquivo)
-        pasta_saida = ROOT + '/saida/' + resultado['sigla_uf'].lower() + '/' + slugify(resultado['nome_cidade']) + '/'
-        itens.append([cidade, subtitulo, urnas, cands, pasta_saida, arquivo])
+            arq_urnas = urnas.split(',')
+            if len(arq_urnas) > 1:
+                arq_urnas = arq_urnas[0]
+            else:
+                arq_urnas = arq_urnas[0]
+            arq_urnas = arq_urnas.zfill(3)
+
+            data = datetime.now()
+            data = data.strftime("%y%m%d-%H%M%S")
+
+            arquivo = arq_urnas + '_' + data + '_' + cidade.replace(' ', '-').replace('---', '-')
+            arquivo = slugify(arquivo)
+            pasta_saida = ROOT + '/saida/' + resultado['sigla_uf'].lower() + '/' + slugify(resultado['nome_cidade']) + '/'
+            itens.append([cidade, subtitulo, urnas, cands, pasta_saida, arquivo])
+            cidades_resultados[cod_cidade] = urnas
+
+    with open('cidades_resultados.p', 'wb') as fp:
+        pickle.dump(cidades_resultados, fp)
 
     pool = Pool(20)
     result = pool.map(gera_resultado, itens)

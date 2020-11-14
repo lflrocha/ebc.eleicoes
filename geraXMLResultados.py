@@ -6,23 +6,22 @@ import requests
 import ast
 import datetime
 import random
+import shutil
 from multiprocessing.dummy import Pool
 
 from slugify import slugify
 
-devel = False
+devel = True
 
 if devel:
     DESTINO = "/Volumes/casparcg/rundown/eleicoes/"
     DESTINO_FOTOS = "/Volumes/casparcg/rundown/eleicoes/fotos/"
-    DESTINO_FOTOS2 = "/Volumes/#CasparEBC/rundown/eleicoes/fotos/"
     DESTINO_LOCAL =  "./saidas/resultados/"
     if not os.path.isdir(DESTINO):
        os.system("mkdir /Volumes/casparcg; mount -t cifs -o username=casparcg,password=casparcg //10.61.30.37/casparcg /Volumes/casparcg")
 else:
     DESTINO = "/mnt/casparcg/rundown/eleicoes/"
     DESTINO_FOTOS = "/mnt/casparcg/rundown/eleicoes/fotos/"
-    DESTINO_FOTOS2 = "/Volumes/#CasparEBC/rundown/eleicoes/fotos/"
     DESTINO_LOCAL =  "/opt/ebc.eleicoes/saidas/resultados/"
     if not os.path.isdir(DESTINO):
         os.system("mkdir /mnt/casparcg; mount -t cifs -o username=casparcg,password=casparcg //10.61.30.37/casparcg /mnt/casparcg")
@@ -31,7 +30,7 @@ if not os.path.isdir(DESTINO_LOCAL):
     os.makedirs(DESTINO_LOCAL)
 
 URL = 'https://eleicoes.ebc.com.br'
-URL_FOTOS = 'http://web1-prod-eleicoes.ebc/fotos/'
+URL_FOTOS = 'https://eleicoes.ebc.com.br/fotos/'
 
 portas = ['8080', '8081', '8082', '8083']
 porta = random.choice(portas)
@@ -51,10 +50,6 @@ def geraXMLCidade(cidade):
     if not os.path.isdir(destino_fotos):
         os.makedirs(destino_fotos)
 
-    destino_fotos2 = DESTINO_FOTOS2 + uf.lower()
-    if not os.path.isdir(destino_fotos2):
-        os.makedirs(destino_fotos2)
-
     dados_candidatos = []
     for candidato in candidatos[:4]:
         nome = candidato['nome']
@@ -65,20 +60,13 @@ def geraXMLCidade(cidade):
 
         caminho_foto = destino_fotos + '/' + str(foto) + '.jpg'
         url_fotos = URL_FOTOS + uf + '/' + foto + '.jpg'
-        url_fotos = 'https://eleicoes.ebc.com.br/fotos/AC/10000644872.jpg'
         print(url_fotos)
         if not os.path.isfile(caminho_foto):
             r = requests.get(url_fotos, allow_redirects=True)
-            open(caminho_foto, 'wb').write(r.content)
-
-        caminho_foto2 = destino_fotos2 + '/' + str(foto) + '.jpg'
-        print(caminho_foto2)
-        url_fotos = URL_FOTOS + uf + '/' + foto + '.jpg'
-        url_fotos = 'https://eleicoes.ebc.com.br/fotos/AC/10000644872.jpg'
-        print(url_fotos)
-        if not os.path.isfile(caminho_foto2):
-            r = requests.get(url_fotos, allow_redirects=True)
-            open(caminho_foto2, 'wb').write(r.content)
+            if r.status_code == 200:
+                open(caminho_foto, 'wb').write(r.content)
+            else:
+                shutil.copy2('sem_foto.png', caminho_foto)
 
         if "status" in  candidato.keys():
             status = candidato['status']
@@ -121,7 +109,6 @@ def geraXMLCidade(cidade):
     aux = aux + '<id>f3</id>\n'
     aux = aux + '<value>%s%%</value>\n' % urnas
     aux = aux + '</componentdata>\n'
-
     aux = aux + '<componentdata>\n'
     aux = aux + '<id>f4</id>\n'
     aux = aux + '<value>Eleição para prefeito</value>\n'
@@ -134,7 +121,6 @@ def geraXMLCidade(cidade):
     aux = aux + '<id>f6</id>\n'
     aux = aux + '<value></value>\n'
     aux = aux + '</componentdata>\n'
-
 
     for i, item in enumerate(dados_candidatos):
         index = (i + 1) * 10
@@ -214,23 +200,3 @@ with open(DESTINO_LOCAL + agora + '-resultados.xml', 'w') as f:
 
 with open(DESTINO + 'resultados.xml', 'w') as f:
     f.write(aux)
-
-
-
-#
-#
-# itens = []
-# for item in lista_itens:
-#     endereco = item['endereco']
-#     titulo = item['titulo']
-#     programa = endereco.split('/')
-#     programa = programa[4]
-#     data = item['data']
-#     id = slugify(titulo)
-#     arquivo = destino + programa + '/' + data + '_' +  id + '.xml'
-#     if not os.path.exists(destino + programa):
-#         os.makedirs(destino + programa)
-#     itens.append([arquivo, endereco])
-#
-# pool = Pool(20)
-# result = pool.map(baixa_dados, itens)
