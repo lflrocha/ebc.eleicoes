@@ -166,7 +166,7 @@ def main():
 
         if (cidade_na_lista == False) or (cidade_na_lista == True and urnas != urnas_anterior):
             cidade = resultado['nome_cidade'] + '-' + resultado['sigla_uf']
-            print(resultado['sigla_uf'] + '-' + resultado['nome_cidade'])
+            #print(resultado['sigla_uf'] + '-' + resultado['nome_cidade'])
             subtitulo = "Prefeito"
             candidatos = resultado['candidatos']
             cands = []
