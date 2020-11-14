@@ -52,9 +52,8 @@ def main():
             aux = cidade['descricao']
             nome = aux.split(': ', 1)
             nome = nome[1].split(' (')[0]
-            print(status)
-
             if status != "Haverá Segundo Turno.":
+                linha = ""
                 if status == "Eleito" or status == "Eleita":
                     linha = 'CG 1-100 ADD 1 \"eleicoes/ELEICOES_TARJA_FOGUETE_ELEITO\" 1 '
                     linha = linha + '\"<templateData>'
@@ -81,7 +80,6 @@ def main():
                     linha = linha + '</componentData>'
                     linha = linha + '</templateData>\" \r\n'
 
-                print(linha)
                 with open(DESTINO_LOCAL + agora + "-comandos.txt", 'w') as f:
                     f.write(linha)
 
