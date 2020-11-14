@@ -12,7 +12,7 @@ from multiprocessing.dummy import Pool
 from cidades import cidades
 
 from os.path import dirname, abspath
-ROOT = dirname(dirname(abspath(__file__))) + '/'
+ROOT = dirname(abspath(__file__)) + '/'
 
 
 def gera_resultado(itens):
@@ -179,7 +179,7 @@ def main():
 
     fim = datetime.now()
     print(fim-inicio)
-    os.system(ROOT + "/resultados/sync.sh")    
+    os.system(ROOT + "/resultados/sync.sh")
 
 
 if __name__ == "__main__":
