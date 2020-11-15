@@ -57,7 +57,7 @@ def geraXMLCidade(cidade):
             if len(nome) > 21:
                 aux = nome.rfind(' ', 1)
                 nome = nome[:aux]
-                        
+
             partido = candidato['partido']
             votos = candidato['votos_total']
             votos_percentual = candidato['votos_percent']
@@ -128,6 +128,7 @@ def geraXMLCidade(cidade):
 
         for i, item in enumerate(dados_candidatos):
             index = (i + 1) * 10
+            print(item["nome"])
             aux = aux + '<componentdata>\n'
             aux = aux + '<id>f%s</id>\n' % str(index)
             aux = aux + '<value>%s</value>\n' % item["nome"]
