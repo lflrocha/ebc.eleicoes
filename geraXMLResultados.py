@@ -127,7 +127,6 @@ def geraXMLCidade(cidade):
 
         for i, item in enumerate(dados_candidatos):
             index = (i + 1) * 10
-            print(item["nome"])
             aux = aux + '<componentdata>\n'
             aux = aux + '<id>f%s</id>\n' % str(index)
             aux = aux + '<value>%s</value>\n' % item["nome"]
