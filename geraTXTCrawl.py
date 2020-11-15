@@ -30,7 +30,7 @@ def main():
     cidades = []
     espacador = '   '
 
-    for item in lista_ordenada[:10]:
+    for item in lista_ordenada[:2]:
         dados_cidade =  item['nome_cidade'] + '/' + item['sigla_uf']
         dados_resultado = "<b>URNAS APURADAS:</b> %s%%" % (item['secoes_totalizadas_percent'])
         dados_resultado = dados_resultado.replace("100,00", "100")
