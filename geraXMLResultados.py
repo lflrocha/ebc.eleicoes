@@ -52,12 +52,10 @@ def geraXMLCidade(cidade):
 
         dados_candidatos = []
         for candidato in candidatos[:4]:
-            nome = candidato['nome']
-            print(len(nome))
+            nome = candidato['nome_gc']
             if len(nome) > 21:
                 aux = nome.rfind(' ', 0, 20)
                 nome = nome[:aux]
-                print(aux, nome)
 
             partido = candidato['partido']
             votos = candidato['votos_total']
