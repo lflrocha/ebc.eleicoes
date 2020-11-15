@@ -55,7 +55,8 @@ def geraXMLCidade(cidade):
             nome = candidato['nome']
 
             if len(nome) > 21:
-                aux = nome.rfind(' ', 0, 21)
+                aux = nome.rfind(' ', 0, 20)
+                print(aux, nome)
                 nome = nome[:aux]
 
             partido = candidato['partido']
