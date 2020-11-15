@@ -108,7 +108,9 @@ def gera_resultado(itens):
             baseImg.text((nome_X, 885), status.strip(), font=fonte_status, fill=cor_textos)
 
 
-        nome = nome[:17].upper()
+        if len(nome) > 21:
+            aux = nome.rfind(' ', 1)
+            nome = nome[:aux]
 
         tamanho = baseImg.textsize(nome.strip(), font=fonte_nome)
         nome_X = (300 - tamanho[0]) / 2 + linha1X

@@ -53,6 +53,11 @@ def geraXMLCidade(cidade):
         dados_candidatos = []
         for candidato in candidatos[:4]:
             nome = candidato['nome']
+
+            if len(nome) > 21:
+                aux = nome.rfind(' ', 1)
+                nome = nome[:aux]
+                        
             partido = candidato['partido']
             votos = candidato['votos_total']
             votos_percentual = candidato['votos_percent']

@@ -52,6 +52,7 @@ def main():
         linha = linha + '</componentData>'
         camada = (num_cidade % 7) + 1
         print(camada)
+        camada = 1
         linha = linha + '<componentData id=\\"f90\\">'
         linha = linha + '<data id=\\"text\\" value=\\"%s\\"/>' % str(camada)
         linha = linha + '</componentData>'
@@ -64,6 +65,11 @@ def main():
         for index, candidato in enumerate(candidatos[:4]):
 
             nome = candidato['nome_gc'],
+
+            if len(nome) > 21:
+                aux = nome.rfind(' ', 1)
+                nome = nome[:aux]
+
             partido = candidato['partido'],
             votos_percent = candidato['votos_percent']
             votos = candidato['votos_total']
@@ -71,8 +77,8 @@ def main():
 
             caminho_foto = destino_fotos + '/' + sigla_uf + '/' + str(foto) + '.jpg'
             url_fotos = 'http://web1-prod-eleicoes.ebc/fotos/' + sigla_uf + '/' + foto + '.jpg'
-#            url_fotos = 'http://web1-prod-eleicoes.ebc/2020/municipal/primeiro-turno/complemento/prefeito/fotos/' + sigla_uf.lower() + '/' + foto + '.jpg'
-            url_fotos = 'http://web1-prod-eleicoes.ebc/fotos/AC/10000644872.jpg'
+            url_fotos = 'http://web1-prod-eleicoes.ebc/2020/municipal/primeiro-turno/complemento/prefeito/fotos/' + sigla_uf.lower() + '/' + foto + '.jpg'
+#            url_fotos = 'http://web1-prod-eleicoes.ebc/fotos/AC/10000644872.jpg'
             r = requests.get(url_fotos, allow_redirects=True)
             open(caminho_foto, 'wb').write(r.content)
             if not os.path.isfile(caminho_foto):
