@@ -39,7 +39,6 @@ url = "http://gcebc-prod01.ebc:%s/ebcgceleicoes/resultados/getCidadesResultadosT
 def geraXMLCidade(cidade):
     url =  "https://eleicoes.ebc.com.br/2020/municipal/primeiro-turno/dados/prefeito/%s.json" % cidade
     req = requests.get(url)
-    print(req)
     if req.status_code == 200:
         resultado = req.json()
         cidade = resultado['nome_cidade']
@@ -54,7 +53,7 @@ def geraXMLCidade(cidade):
         dados_candidatos = []
         for candidato in candidatos[:4]:
             nome = candidato['nome']
-
+            print(nome)
             if len(nome) > 21:
                 aux = nome.rfind(' ', 0, 20)
                 nome = nome[:aux]
